@@ -1,25 +1,28 @@
 package com.solvd.laba.models.persons.employees;
 
+import com.solvd.laba.enums.ContractType;
+import com.solvd.laba.interfaces.ICenterEmployee;
 import com.solvd.laba.models.persons.Person;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
-public abstract class CenterEmployee extends Person implements ICenterEmployee{
-    private static final String centerName = "SunnyCenter";
+public abstract class CenterEmployee extends Person implements ICenterEmployee {
+
+    private static String centerName;
+
     protected LocalDate dateOfEmployment;
 
     public CenterEmployee(String name, String surname) {
         super(name,surname);
         dateOfEmployment = LocalDate.now();
-
+        centerName = "SunnyCenter";
     }
 
 
     public LocalDate getDateOfEmployment() {
         return dateOfEmployment;
     }
-
 
     public abstract int calculateSalary();
 
@@ -50,4 +53,5 @@ public abstract class CenterEmployee extends Person implements ICenterEmployee{
                 ", surname='" + surname + '\'' +
                 '}';
     }
+
 }

@@ -3,13 +3,16 @@ package com.solvd.laba.models.parkings;
 
 import com.solvd.laba.exception.NegativeValueException;
 import com.solvd.laba.exception.ValidationException;
-import com.solvd.laba.exception.NullValueException;
+
+import com.solvd.laba.exception.WrongTimeException;
+import com.solvd.laba.interfaces.ISpaces;
 
 import java.time.LocalTime;
 import java.util.Map;
 import java.util.Objects;
 
-public class Parking {
+public class Parking implements ISpaces {
+
     private int parkingLevels;
     private LocalTime openTime;
     private LocalTime closeTime;
@@ -41,11 +44,11 @@ public class Parking {
 
     public void setCloseTime(LocalTime closeTime) {
         if(closeTime == null){
-            throw new NullValueException("Close Time cannot be null");
+            throw new NullPointerException("Close Time cannot be null");
         }
         if(closeTime.isAfter(openTime)) {
             this.closeTime = closeTime;
-        } else throw new ValidationException("Close Time must be greater than open Time");
+        } else throw new WrongTimeException("Close Time must be greater than open Time");
     }
 
     public LocalTime getOpenTime() {
@@ -54,11 +57,11 @@ public class Parking {
 
     public void setOpenTime(LocalTime openTime) {
         if(openTime == null){
-            throw new NullValueException("Open Time cannot be null");
+            throw new NullPointerException("Open Time cannot be null");
         }
         if(openTime.isBefore(closeTime)) {
             this.openTime = openTime;
-        } else throw new ValidationException("Close Time must be greater than open Time");
+        } else throw new WrongTimeException("Close Time must be greater than open Time");
     }
 
     public Map<Integer,ParkingSpace> getParkingSpaces() {
@@ -90,5 +93,33 @@ public class Parking {
                 ", closeTime=" + closeTime +
                 ", parkingSpaces=" + parkingSpaces +
                 '}';
+    }
+
+    @Override
+    public int calculateFreeSpaces() {
+        if(parkingSpaces.isEmpty()){
+            return 0;
+        }
+        int counter = 0;
+        for(ParkingSpace parkingSpace : parkingSpaces.values()){
+            if(!parkingSpace.isOccupied()){
+                counter++;
+            }
+        }
+        return counter;
+    }
+
+    @Override
+    public int calculateOccupiedSpaces() {
+        if(parkingSpaces.isEmpty()){
+            return 0;
+        }
+        int counter = 0;
+        for(ParkingSpace parkingSpace : parkingSpaces.values()){
+            if(parkingSpace.isOccupied()){
+                counter++;
+            }
+        }
+        return counter;
     }
 }

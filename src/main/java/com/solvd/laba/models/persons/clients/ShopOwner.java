@@ -1,6 +1,7 @@
 package com.solvd.laba.models.persons.clients;
 
 import com.solvd.laba.collections.CustomLinkedList;
+import com.solvd.laba.interfaces.IMyPredict;
 import com.solvd.laba.models.persons.Person;
 import com.solvd.laba.models.premises.Shop;
 
@@ -31,10 +32,15 @@ public final class ShopOwner extends Person {
     public int getRating() {
         return rating;
     }
+
     public void setRating(int rating) {
         this.rating = rating;
     }
 
+    public boolean isGoodClient(){
+        IMyPredict<Integer> predict = rate -> rate >= 3.5;
+        return predict.predict(rating);
+    }
     @Override
     public String toString() {
         return "ShopOwner{" +

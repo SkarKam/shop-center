@@ -1,23 +1,29 @@
 package com.solvd.laba.models.parkings;
 
+import com.solvd.laba.enums.ParkingSpaceType;
 import com.solvd.laba.exception.NegativeValueException;
+import com.solvd.laba.interfaces.IRevenue;
 
 import java.awt.*;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class ParkingSpace implements Serializable {
+public class ParkingSpace implements IRevenue, Serializable {
+
+    private static int cost;
+
+    private final ParkingSpaceType type;
+
     private int id;
-    private final Dimension dimension;
     private boolean isPaid;
     private boolean isOccupied;
-    private static int cost = 10;
 
-    public ParkingSpace(int id, Dimension dimension) {
+    public ParkingSpace(int id, ParkingSpaceType type) {
         this.id = id;
-        this.dimension = dimension;
+        this.type = type;
         this.isPaid = false;
         this.isOccupied = false;
+        cost = 10;
     }
 
     public int getId() {
@@ -32,8 +38,8 @@ public class ParkingSpace implements Serializable {
         }
     }
 
-    public Dimension getDimension() {
-        return dimension;
+    public ParkingSpaceType getParkingSpaceType() {
+        return type;
     }
 
 
@@ -66,26 +72,36 @@ public class ParkingSpace implements Serializable {
     }
 
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ParkingSpace that = (ParkingSpace) o;
-        return isPaid == that.isPaid && isOccupied == that.isOccupied && Objects.equals(dimension, that.dimension);
+        return id == that.id && isPaid == that.isPaid && isOccupied == that.isOccupied && type == that.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(dimension, isPaid, isOccupied);
+        return Objects.hash(type, id, isPaid, isOccupied);
     }
 
     @Override
     public String toString() {
         return "ParkingSpace{" +
-                "dimension=" + dimension +
+                "type=" + type +
+                ", id=" + id +
                 ", isPaid=" + isPaid +
                 ", isOccupied=" + isOccupied +
                 '}';
+    }
+
+    @Override
+    public int getRevenue() {
+        if(isPaid()){
+            if(isOccupied()) {
+                return cost;
+            }
+        }
+        return 0;
     }
 }

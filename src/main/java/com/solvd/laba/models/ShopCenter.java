@@ -1,16 +1,28 @@
 package com.solvd.laba.models;
 
 import com.solvd.laba.exception.BlankValueException;
-import com.solvd.laba.exception.NullValueException;
-import com.solvd.laba.models.parkings.Parking;
-import com.solvd.laba.models.premises.Premise;
 
+import com.solvd.laba.interfaces.IShopCenter;
+import com.solvd.laba.interfaces.ISpaces;
+import com.solvd.laba.models.parkings.Parking;
+import com.solvd.laba.models.parkings.ParkingSpace;
+import com.solvd.laba.models.premises.Premise;
+import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.NoSuchFileException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Supplier;
 
-public class ShopCenter implements IShopCenter, Serializable {
+public class ShopCenter implements IShopCenter, ISpaces, Serializable {
+
+    private static final Logger logger = LogManager.getLogger(ShopCenter.class);
 
     private String shopCenterName;
     private List<Premise> premises;
@@ -61,7 +73,7 @@ public class ShopCenter implements IShopCenter, Serializable {
         if(address != null) {
             this.address = address;
         } else {
-            throw new NullValueException("Address cannot be blank.");
+            throw new NullPointerException("Address cannot be blank.");
         }
     }
 
@@ -76,7 +88,7 @@ public class ShopCenter implements IShopCenter, Serializable {
         if(mallRegions != null) {
             this.mallRegions.add(mallRegion);
         } else {
-            throw new NullValueException("CenterWorkersSection cannot be blank.");
+            throw new NullPointerException("CenterWorkersSection cannot be blank.");
         }
     }
 
@@ -102,5 +114,56 @@ public class ShopCenter implements IShopCenter, Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(shopCenterName, premises, parking, address, mallRegions);
+    }
+
+    @Override
+    public int calculateRevenue() {
+        Supplier<Integer> supplier = () -> {
+            int revenue = 0;
+            for (Premise premise : premises) {
+                revenue += premise.getRevenue();
+            }
+            for (ParkingSpace space : parking.getParkingSpaces().values()) {
+                revenue += space.getRevenue();
+            }
+            for (MallRegion mallRegion : mallRegions) {
+                revenue -= mallRegion.calculateCost();
+            }
+            return revenue;
+        };
+        return supplier.get();
+    }
+
+    public void generateRevenueInfo(){
+        logger.info("Creating Shop Center Revenue");
+        File file = new File("target/revenue.txt");
+        try {
+            FileUtils.writeStringToFile(file,String.valueOf(calculateRevenue()),"UTF-8");
+            logger.info("Shop Center Revenue Info created");
+
+        } catch (IOException e) {
+            logger.error("Input File Error");
+        }
+    }
+    @Override
+    public int calculateFreeSpaces() {
+        int result = 0;
+        for(Premise premise : premises){
+            if(premise.getShop()==null){
+                result++;
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public int calculateOccupiedSpaces() {
+        int result = 0;
+        for(Premise premise : premises){
+            if(premise.getShop()!=null){
+                result++;
+            }
+        }
+        return result;
     }
 }

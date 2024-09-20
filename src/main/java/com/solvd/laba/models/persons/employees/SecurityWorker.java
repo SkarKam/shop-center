@@ -1,5 +1,6 @@
 package com.solvd.laba.models.persons.employees;
 
+import com.solvd.laba.enums.ContractType;
 import com.solvd.laba.exception.NegativeValueException;
 import com.solvd.laba.exception.BlankValueException;
 import com.solvd.laba.exception.ValidationException;
@@ -9,9 +10,10 @@ import java.util.Objects;
 //Add fields
 public class SecurityWorker extends CenterEmployee {
 
-    private int rate;
-    private int hoursWorked;
     private static String securityCompany;
+
+    private int rate;
+    private ContractType contractType;
 
     static {
         securityCompany = "SecCom";
@@ -20,7 +22,6 @@ public class SecurityWorker extends CenterEmployee {
     public SecurityWorker(String name, String surname) {
         super(name, surname);
         this.rate = 25;
-        this.hoursWorked = 0;
     }
 
     public int getRate() {
@@ -35,16 +36,13 @@ public class SecurityWorker extends CenterEmployee {
         }
     }
 
-    public int getHoursWorked() {
-        return hoursWorked;
+    public ContractType getContractType() {
+        return contractType;
     }
 
-    public void setHoursWorked(int hoursWorked) {
-        if(hoursWorked >= 0) {
-            this.hoursWorked = hoursWorked;
-        } else {
-            throw new NegativeValueException("Hours worked cannot be negative");
-        }
+
+    public void setContractType(ContractType contractType) {
+        this.contractType = contractType;
     }
 
     public static String getSecurityCompany() {
@@ -61,29 +59,32 @@ public class SecurityWorker extends CenterEmployee {
 
     @Override
     public int calculateSalary() {
-        return  rate * hoursWorked;
-    }
-
-    @Override
-    public String toString() {
-        return "SecurityWorker{" +
-                ", name='" + name + '\'' +
-                ", surname='" + surname + '\'' +
-                "rate=" + rate +
-                ", hoursWorked=" + hoursWorked +
-                "}\n";
+        return  rate * contractType.getHours();
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         SecurityWorker that = (SecurityWorker) o;
-        return rate == that.rate && hoursWorked == that.hoursWorked;
+        return rate == that.rate && contractType == that.contractType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(rate, hoursWorked);
+        return Objects.hash(super.hashCode(), rate, contractType);
     }
+
+    @Override
+    public String toString() {
+        return "SecurityWorker{" +
+                "rate=" + rate +
+                ", contractType=" + contractType +
+                ", dateOfEmployment=" + dateOfEmployment +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                '}';
+    }
+
 }

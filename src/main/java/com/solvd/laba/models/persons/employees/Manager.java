@@ -1,8 +1,13 @@
 package com.solvd.laba.models.persons.employees;
 
+import com.solvd.laba.enums.Rating;
 import com.solvd.laba.exception.NegativeValueException;
 import com.solvd.laba.exception.ValidationException;
 
+import java.io.File;
+import java.util.function.Predicate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Manager extends CenterEmployee {
@@ -10,11 +15,13 @@ public class Manager extends CenterEmployee {
     private static int bonus = 1000;
 
     private int salary;
+    private List<Integer> ratings = new ArrayList<>();;
     private boolean isObligationFulfilled;
 
     public Manager(String name, String surname) {
         super(name, surname);
         this.isObligationFulfilled = true;
+        ratings.add(75);
     }
 
     public int getSalary() {
@@ -45,13 +52,40 @@ public class Manager extends CenterEmployee {
         return isObligationFulfilled;
     }
 
-    public void setObligationFulfilled(boolean obligationFulfilled) {
-        isObligationFulfilled = obligationFulfilled;
+    public void setObligationFulfilled() {
+        Predicate<Integer> isEnough = avgRating -> avgRating >= Rating.GOOD.getMinRate();
+        isObligationFulfilled = isEnough.test(getAverageRating());
     }
 
+    public List<Integer> getRating() {
+        return ratings;
+    }
+
+    public void setRating(List<Integer> ratings) {
+        this.ratings = ratings;
+    }
+
+    public void addRating(int rating) {
+        if(rating>=0 && rating<=100) {
+            this.ratings.add(rating);
+        } else {
+            throw new ValidationException("Rating must be between 0 and 100");
+        }
+    }
+
+    public int getAverageRating() {
+        int result = 0;
+        int counter = 0;
+        for(Integer rating : ratings) {
+            result += rating;
+            counter++;
+        }
+        return result / counter;
+    }
     @Override
     public int calculateSalary() {
-        if(isObligationFulfilled()) {
+
+        if(isObligationFulfilled) {
             return salary + bonus;
         } else {
             return salary;

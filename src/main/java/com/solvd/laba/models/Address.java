@@ -5,7 +5,8 @@ import com.solvd.laba.exception.BlankValueException;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class Address implements IAdrress, Serializable {
+public class Address implements Serializable {
+
     private String street;
     private String city;
     private String state;

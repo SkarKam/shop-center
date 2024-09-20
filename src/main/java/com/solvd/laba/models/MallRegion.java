@@ -1,20 +1,26 @@
 package com.solvd.laba.models;
 
 import com.solvd.laba.exception.BlankValueException;
-import com.solvd.laba.exception.NullValueException;
+
+import com.solvd.laba.interfaces.ICost;
+import com.solvd.laba.models.persons.clients.ShopOwner;
 import com.solvd.laba.models.persons.employees.Janitor;
 import com.solvd.laba.models.persons.employees.Manager;
 import com.solvd.laba.models.persons.employees.SecurityWorker;
 
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
+
 
 //rename
-public class MallRegion {
+public class MallRegion implements ICost {
+
     private String sectionName;
     private Manager manager;
     private Set<Janitor> janitors;
     private Set<SecurityWorker> securityWorkers;
+    private Set<ShopOwner> shopOwners;
 
     public MallRegion(String sectionName, Manager manager, Set<Janitor> janitors,Set<SecurityWorker> securityWorkers) {
         this.sectionName = sectionName;
@@ -47,23 +53,23 @@ public class MallRegion {
         if(manager!=null) {
             this.manager = manager;
         } else {
-            throw new NullValueException("Manager cannot be null.");
+            throw new NullPointerException("Manager cannot be null.");
         }
     }
 
-    public Set<Janitor> getWorkers() {
+    public Set<Janitor> getJanitors() {
         return janitors;
     }
 
-    public void setWorkers(Set<Janitor> janitors) {
+    public void setJanitors(Set<Janitor> janitors) {
         this.janitors = janitors;
     }
 
-    public void addWorkers(Janitor janitor){
+    public void addJanitor(Janitor janitor){
         if(janitor !=null) {
             this.janitors.add(janitor);
         } else {
-            throw new NullValueException("Worker cannot be null.");
+            throw new NullPointerException("Worker cannot be null.");
         }
     }
 
@@ -77,10 +83,11 @@ public class MallRegion {
     public void addSecurityWorker(SecurityWorker securityWorkers) {
         if(securityWorkers!=null) {
             this.securityWorkers.add(securityWorkers);
-        } else {throw new NullValueException("Security worker cannot be null.");}
+        } else {throw new NullPointerException("Security worker cannot be null.");}
     }
 
     public int getAllWorkersSalary(){
+
         int result = 0;
         for(Janitor janitor : janitors){
             result+= janitor.getSalary();
@@ -95,7 +102,7 @@ public class MallRegion {
             counter++;
         }
         for(SecurityWorker securityWorker : securityWorkers){
-            result += securityWorker.getHoursWorked();
+            result += securityWorker.getContractType().getHours();
             counter++;
         }
         result+=manager.getSalary();
@@ -103,6 +110,30 @@ public class MallRegion {
         return result/counter;
     }
 
+    public Set<ShopOwner> getShopOwners() {
+        return shopOwners;
+    }
+
+    public void setShopOwners(Set<ShopOwner> shopOwners) {
+        this.shopOwners = shopOwners;
+    }
+
+
+    public void printAllEmployees(){
+        Consumer<MallRegion> employees = region -> {
+
+            System.out.println("Manager: "+region.getManager());
+
+            region.getJanitors().forEach(janitor -> {
+                System.out.println("Janitor: " + janitor.getName() + " " + janitor.getSurname());
+            });
+            region.getSecurityWorkers().forEach(securityWorker -> {
+                System.out.println("SecurityWorker: " + securityWorker.getName() + " " + securityWorker.getSurname());
+            });
+        };
+
+        employees.accept(this);
+    }
     @Override
     public String toString() {
         return "\nCenterWorkersSection{" +
@@ -124,5 +155,18 @@ public class MallRegion {
     @Override
     public int hashCode() {
         return Objects.hash(sectionName, manager, janitors, securityWorkers);
+    }
+
+    @Override
+    public int calculateCost() {
+        int result = 0;
+        for(Janitor janitor : janitors){
+            result += janitor.getSalary();
+        }
+        for(SecurityWorker securityWorker : securityWorkers){
+            result += securityWorker.getContractType().getHours();
+        }
+        result+=manager.getSalary();
+        return result;
     }
 }

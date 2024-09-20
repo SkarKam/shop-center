@@ -1,27 +1,37 @@
 package com.solvd.laba.models.premises;
 
+import com.solvd.laba.enums.PremiseSizeType;
 import com.solvd.laba.exception.AlreadyTakenException;
 import com.solvd.laba.exception.ValidationException;
-import com.solvd.laba.exception.NullValueException;
+
+import com.solvd.laba.interfaces.IRevenue;
 
 import java.awt.*;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.function.Function;
 
-public class Premise {
-    private static int monthlyCost = 5000;
+public class Premise implements IRevenue {
+
+    private static int monthlyCost; //per 1 m2
+
     private Shop shop;
     private LocalDate rentalDate;
     private Dimension dimension;
+    private PremiseSizeType premiseSizeType;
 
     public Premise(Shop shop, Dimension dimension) {
         this.shop = shop;
         this.rentalDate = LocalDate.now();
         this.dimension = dimension;
+        monthlyCost = 5000;
+        setPremiseSize();
     }
     //Premise can exist without shop
     public Premise(Dimension dimension) {
         this.dimension = dimension;
+        monthlyCost = 5000;
+        setPremiseSize();
     }
 
     public static int getMonthlyCost() {
@@ -51,8 +61,12 @@ public class Premise {
                 return;
             }
             if(getShop()==null){
-                this.shop = shop;
-                setRentalDate();
+                if(shop.getShopType().getEstimitedIncome()>getPremiseCost()) {
+                    this.shop = shop;
+                    setRentalDate();
+                } else {
+                    throw new ValidationException("Shop estimited income should be greater than premise cost");
+                }
             } else {
                 throw new AlreadyTakenException("Other shop already use this premise");
             }
@@ -66,7 +80,7 @@ public class Premise {
         if(dimension != null) {
             this.dimension = dimension;
         } else {
-            throw new NullValueException("Dismension cannot be null");
+            throw new NullPointerException("Dismension cannot be null");
         }
     }
 
@@ -84,7 +98,7 @@ public class Premise {
     }
 
    public int getPremiseCost(){
-        return (int)dimension.getWidth()*(int)dimension.getHeight() * monthlyCost;
+        return (int)dimension.getWidth()*(int)dimension.getHeight() * (monthlyCost- premiseSizeType.getExtraDiscount());
     }
 
 
@@ -93,6 +107,21 @@ public class Premise {
     }
     public static int getDimensionCost(int width, int length){
         return monthlyCost *width*length;
+    }
+
+    public PremiseSizeType getPremiseSizeType() {
+        return premiseSizeType;
+    }
+
+    public void setPremiseSize() {
+        int size = (int) dimension.getWidth() * (int) dimension.getHeight();
+        if(PremiseSizeType.SMALL.getMaxSize()<=size) {
+            premiseSizeType = PremiseSizeType.SMALL;
+        } else if(PremiseSizeType.LARGE.getMinSize()>=size) {
+            premiseSizeType = PremiseSizeType.LARGE;
+        } else {
+            premiseSizeType = PremiseSizeType.MEDIUM;
+        }
     }
 
     @Override
@@ -115,5 +144,15 @@ public class Premise {
     @Override
     public int hashCode() {
         return Objects.hash(shop, rentalDate, dimension);
+    }
+
+
+    @Override
+    public int getRevenue() {
+        if(getShop()==null) {
+            return 0;
+        } else {
+            return getPremiseCost();
+        }
     }
 }

@@ -1,34 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
+<Configuration status="info">
     <Properties>
         <Property name="basePath">target/test.log</Property>
+        <Property name="layout">[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n</Property>
     </Properties>
 
     <Appenders>
         <RollingFile name="RollingFile"
                      fileName="./target/test.log"
                      filePattern="./target/$test-%d{yyyy-MM-dd}.log">
-            <PatternLayout>
-                <pattern>[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n
-                </pattern>
-            </PatternLayout>
+            <PatternLayout pattern="${layout}"/>
             <TimeBasedTriggeringPolicy/>
         </RollingFile>
 
-        <Console name="STDOUT" target="SYSTEM_OUT" ignoreExceptions="false">
-            <PatternLayout pattern="%m%n"/>
+        <Console name="Console" target="SYSTEM_OUT" ignoreExceptions="false">
+            <PatternLayout pattern="${layout}"/>
         </Console>
 
-        <Failover name="Failover" primary="RollingFile">
-            <Failovers>
-                <AppenderRef ref="STDOUT"/>
-            </Failovers>
-        </Failover>
     </Appenders>
 
     <Loggers>
         <Root level="info" additivity="false">
-            <AppenderRef ref="Failover" />
+            <AppenderRef ref="RollingFile"/>
+            <AppenderRef ref="Console" />
         </Root>
     </Loggers>
 </Configuration>

@@ -1,14 +1,20 @@
 package com.solvd.laba.models.persons;
 
+import com.solvd.laba.interfaces.IStringRefactor;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Objects;
 
-public abstract class Person implements IPerson {
+public abstract class Person {
+
     protected String name;
     protected String surname;
 
     public Person(String name, String surname) {
-        this.name = name;
-        this.surname = surname;
+        IStringRefactor<String, String> iStringRefactor = StringUtils::capitalize;
+
+        this.name = iStringRefactor.refactor(name);
+        this.surname = iStringRefactor.refactor(surname);
     }
 
     public String getName() {

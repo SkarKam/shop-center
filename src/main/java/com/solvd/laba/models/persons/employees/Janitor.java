@@ -1,10 +1,12 @@
 package com.solvd.laba.models.persons.employees;
 
+import com.solvd.laba.enums.ContractType;
 import com.solvd.laba.exception.ValidationException;
 
 import java.util.Objects;
 
 public class Janitor extends CenterEmployee {
+
     private int salary;
 
     public Janitor(String name, String surname) {
