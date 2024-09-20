@@ -1,5 +1,6 @@
 package com.solvd.laba.interfaces;
 
-public interface IMyPredict<T> {
-    boolean predict(T t);
+@FunctionalInterface
+public interface IMyPredict<T,R> {
+    boolean predict(T t, R r);
 }

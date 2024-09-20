@@ -9,7 +9,7 @@ import com.solvd.laba.interfaces.IRevenue;
 import java.awt.*;
 import java.time.LocalDate;
 import java.util.Objects;
-import java.util.function.Function;
+
 
 public class Premise implements IRevenue {
 

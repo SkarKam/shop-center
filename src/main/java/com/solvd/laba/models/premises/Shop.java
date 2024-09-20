@@ -94,7 +94,7 @@ public class Shop implements Serializable {
         {
             logger.error("Error loading shop", e);
             Shop.save();
-            throw new RuntimeException("There is no file in folder\n" + e);
+            throw new RuntimeException("There is no file in folder.\n Restart the application.");
         }
         catch (ClassNotFoundException e)
         {

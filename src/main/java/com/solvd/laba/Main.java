@@ -201,8 +201,6 @@ public class Main {
 
                     if(fullname.length!=2){
                         System.out.println("Please enter two names: ");
-                        System.out.println(fullname.length);
-                        System.out.println(data);
                         break;
                     }
                     String name = StringUtils.lowerCase(fullname[0]);

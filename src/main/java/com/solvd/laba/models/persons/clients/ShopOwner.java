@@ -6,6 +6,7 @@ import com.solvd.laba.models.persons.Person;
 import com.solvd.laba.models.premises.Shop;
 
 import java.util.Objects;
+import java.util.function.Predicate;
 
 /**
  * Shop owner - client of the shopCenter.
@@ -38,8 +39,8 @@ public final class ShopOwner extends Person {
     }
 
     public boolean isGoodClient(){
-        IMyPredict<Integer> predict = rate -> rate >= 3.5;
-        return predict.predict(rating);
+        Predicate<Integer> predict = rate -> rate >= 3.5;
+        return predict.test(rating);
     }
     @Override
     public String toString() {

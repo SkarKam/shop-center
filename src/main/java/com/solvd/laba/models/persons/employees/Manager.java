@@ -3,6 +3,7 @@ package com.solvd.laba.models.persons.employees;
 import com.solvd.laba.enums.Rating;
 import com.solvd.laba.exception.NegativeValueException;
 import com.solvd.laba.exception.ValidationException;
+import com.solvd.laba.interfaces.IMyPredict;
 
 import java.io.File;
 import java.util.function.Predicate;
