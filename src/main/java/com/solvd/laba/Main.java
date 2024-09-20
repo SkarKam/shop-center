@@ -29,8 +29,11 @@ import java.util.function.Function;
 
 public class Main {
 
-    static File file = new File("target/revenue.txt");
     private static final Logger logger = LogManager.getLogger(Main.class);
+
+    static File file = new File("target/revenue.txt");
+
+
     public static void main(String[] args) {
 
         Function<Integer, Integer> getCost = size -> {
@@ -201,12 +204,14 @@ public class Main {
 
                     if(fullname.length!=2){
                         System.out.println("Please enter two names: ");
+                        logger.warn("Warn: invalid name");
                         break;
                     }
                     String name = StringUtils.lowerCase(fullname[0]);
                     String surname = StringUtils.lowerCase(fullname[1]);
                     if(StringUtils.isBlank(name) || StringUtils.isBlank(surname)){
                         System.out.println("Error: invalid name");
+                        logger.warn("Error: invalid name");
                         break;
                     }
                     System.out.println("Choose type of worker: \n 1) Manager \n 2) Janitor \n 3) Security \n 4) Exit");

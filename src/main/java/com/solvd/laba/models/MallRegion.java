@@ -122,7 +122,7 @@ public class MallRegion implements ICost {
     public void printAllEmployees(){
         Consumer<MallRegion> employees = region -> {
 
-            System.out.println("Manager: "+region.getManager());
+            System.out.println("Manager: "+region.getManager().getName() +" "+region.getManager().getSurname());
 
             region.getJanitors().forEach(janitor -> {
                 System.out.println("Janitor: " + janitor.getName() + " " + janitor.getSurname());
