@@ -5,6 +5,7 @@ import com.solvd.laba.exception.AlreadyTakenException;
 import com.solvd.laba.exception.ValidationException;
 
 import com.solvd.laba.interfaces.IRevenue;
+import com.solvd.laba.interfaces.lambdas.IMyPredict;
 
 import java.awt.*;
 import java.time.LocalDate;
@@ -54,14 +55,14 @@ public class Premise implements IRevenue {
         }
     }
 
-    public void setShop(Shop shop) {
+    public void setShop(Shop shop, IMyPredict<Shop,Integer> predict) {
             if(shop == null) {
                 this.shop = shop;
                 setRentalDate();
                 return;
             }
             if(getShop()==null){
-                if(shop.getShopType().getEstimitedIncome()>getPremiseCost()) {
+                if(predict.predict(shop,getPremiseCost())) {
                     this.shop = shop;
                     setRentalDate();
                 } else {

@@ -6,6 +6,8 @@ import com.solvd.laba.exception.BlankValueException;
 import com.solvd.laba.exception.ValidationException;
 
 import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 //Add fields
 public class SecurityWorker extends CenterEmployee {
@@ -55,6 +57,10 @@ public class SecurityWorker extends CenterEmployee {
         } else {
             throw new BlankValueException("SecurityCompany cannot be blank");
         }
+    }
+
+    public void raiseRate(BiFunction<SecurityWorker, Integer, Boolean> raise, int rate) {
+        raise.apply(this, rate);
     }
 
     @Override

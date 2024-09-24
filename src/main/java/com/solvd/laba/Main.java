@@ -2,7 +2,11 @@ package com.solvd.laba;
 
 import com.solvd.laba.enums.ContractType;
 import com.solvd.laba.enums.ParkingSpaceType;
+import com.solvd.laba.enums.Rating;
 import com.solvd.laba.enums.ShopType;
+import com.solvd.laba.interfaces.lambdas.IMyConsumer;
+import com.solvd.laba.interfaces.lambdas.IMyPredict;
+import com.solvd.laba.interfaces.lambdas.IStringRefactor;
 import com.solvd.laba.models.Address;
 import com.solvd.laba.models.MallRegion;
 import com.solvd.laba.models.ShopCenter;
@@ -21,11 +25,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.awt.*;
 import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.*;
 
 public class Main {
 
@@ -40,6 +47,43 @@ public class Main {
             return size * Premise.getMonthlyCost();
         };
 
+        BiFunction<SecurityWorker, Integer, Boolean> raise = (securityWorker, rate) -> {
+            if(securityWorker.getContractType().getHours()>168){
+                securityWorker.setRate(rate);
+                return true;
+            }
+            return false;
+        };
+
+        Predicate<Integer> isEnough = avgRating -> avgRating >= Rating.GOOD.getMinRate();
+
+        Consumer<MallRegion> employees = region -> {
+            System.out.println("Manager: "+region.getManager().getName() +" "+region.getManager().getSurname());
+            region.getJanitors().forEach(janitor -> {
+                System.out.println("Janitor: " + janitor.getName() + " " + janitor.getSurname());
+            });
+            region.getSecurityWorkers().forEach(securityWorker -> {
+                System.out.println("SecurityWorker: " + securityWorker.getName() + " " + securityWorker.getSurname());
+            });
+        };
+
+        Supplier<Integer> parkingSpaceIDGeneration = () -> {
+            return ParkingSpace.getParkingSpaces().size();
+        };
+
+        IStringRefactor<String> nameRefactor = (name) -> {
+            StringUtils.lowerCase(name);
+            StringUtils.capitalize(name);
+            return name;
+        };
+
+        IMyPredict<Shop,Integer> premisePrediction = (shop, premiseCost) -> {
+            return shop.getShopType().getEstimitedIncome() > premiseCost;
+        };
+
+        IMyConsumer<Collection<Janitor>,Integer> raiseSalary = (janitors, extra) -> {
+          janitors.forEach(janitor -> janitor.setSalary(janitor.getSalary() + extra));
+        };
 
         Shop shop1, shop2;
         Premise premise1, premise2;
@@ -56,10 +100,10 @@ public class Main {
         shop1 = new Shop("Decatlon", ShopType.ClothingStore, LocalDate.of(2024,8,10));
         shop2 = new Shop("Carrefour", ShopType.Mixed, LocalDate.of(2024,8,1));
 
-        parkingSpace1 = new ParkingSpace(1, ParkingSpaceType.ForInvalids);
-        parkingSpace2 = new ParkingSpace(2,ParkingSpaceType.ForOthersCars);
-        parkingSpace3 = new ParkingSpace(3,ParkingSpaceType.ForOthersCars);
-        parkingSpace4 = new ParkingSpace(4,ParkingSpaceType.ForShops);
+        parkingSpace1 = new ParkingSpace(parkingSpaceIDGeneration, ParkingSpaceType.ForInvalids);
+        parkingSpace2 = new ParkingSpace(parkingSpaceIDGeneration,ParkingSpaceType.ForOthersCars);
+        parkingSpace3 = new ParkingSpace(parkingSpaceIDGeneration,ParkingSpaceType.ForOthersCars);
+        parkingSpace4 = new ParkingSpace(parkingSpaceIDGeneration,ParkingSpaceType.ForShops);
 
         parkingSpace1.setOccupied(true);
         parkingSpace2.setOccupied(true);
@@ -156,7 +200,7 @@ public class Main {
         System.out.println("LocalDate: "+shop2.getPaymentDate());
 
         //Methods test
-        System.out.println("All normal workers (excluding security and manager):"+ mallRegion1.getAllWorkersSalary());
+
         System.out.println("Avg salary of section workers(including security, workers, manager):"+ mallRegion1.getAllWorkersSectionAvgSalary());
 
         janitor1.setSalary(3000);
@@ -191,10 +235,10 @@ public class Main {
         shopCenter.generateRevenueInfo();
         while(true){
             Scanner scanner = new Scanner(System.in);
-            System.out.println("Choose action: \n1) Display all employees\n2) Add new employee\n3) Read Shop Center revenue\n4) Display shops\n5) Exit program");
+            System.out.println("Choose action: \n1) Display all employees\n2) Add new employee\n3) Read Shop Center revenue\n4) Display shops\n5) Exit program and activate relfection method");
             switch(scanner.next()){
                 case "1":
-                        mallRegion1.printAllEmployees();
+                        mallRegion1.printAllEmployees(employees);
                     break;
                 case "2":
                     System.out.println("Write name and surname of employee like this: name surname");
@@ -271,6 +315,7 @@ public class Main {
                     System.out.println(Shop.load());
                     break;
                 case "5":
+                    reflectionMethod();
                     logger.info("Exiting program");
                     System.out.println("Exiting program");
                     System.exit(0);
@@ -279,6 +324,52 @@ public class Main {
             }
         }
 
+
+    }
+
+    public static void reflectionMethod(){
+
+        try{
+            Class<?> tmp = Class.forName("com.solvd.laba.models.premises.Shop");
+
+            System.out.println("\nParams: ");
+
+            for(Field field : tmp.getDeclaredFields()){
+                System.out.println("Field name: "+field.getName()+"  type: "+field.getType());
+            }
+
+            System.out.println("\nConstructors: ");
+            for(Constructor constructor : tmp.getDeclaredConstructors()){
+                System.out.println("Constructor name: "+constructor.getName()+" param type: "+ Arrays.toString(constructor.getParameterTypes()) +" genericParamType: "+ Arrays.toString(constructor.getGenericParameterTypes()));
+            }
+
+            System.out.println("\nMethods: ");
+            for(Method method : tmp.getDeclaredMethods()){
+                System.out.println("Method name: "+method.getName()+" param type: "+ Arrays.toString(method.getParameterTypes()) +" return type: "+method.getReturnType());
+            }
+
+            System.out.println("\nCreating new object");
+
+            Constructor<?> constructor = tmp.getConstructor(String.class,  ShopType.class ,LocalDate.class);
+            Object shop = constructor.newInstance("Lidl",ShopType.ClothingStore,LocalDate.of(2024,12,1));
+
+            Method getMethod = tmp.getDeclaredMethod("getShopName");
+            System.out.println(getMethod.invoke(shop));
+
+            Method setMethod = tmp.getDeclaredMethod("setPaymentDate", LocalDate.class);
+            setMethod.invoke(shop,LocalDate.of(2025,02,12));
+            getMethod = tmp.getDeclaredMethod("getPaymentDate");
+            System.out.println(getMethod.invoke(shop));
+
+        } catch (ClassNotFoundException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

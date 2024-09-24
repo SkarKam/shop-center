@@ -3,11 +3,14 @@ package com.solvd.laba.models;
 import com.solvd.laba.exception.BlankValueException;
 
 import com.solvd.laba.interfaces.ICost;
+import com.solvd.laba.interfaces.lambdas.IMyConsumer;
 import com.solvd.laba.models.persons.clients.ShopOwner;
 import com.solvd.laba.models.persons.employees.Janitor;
 import com.solvd.laba.models.persons.employees.Manager;
 import com.solvd.laba.models.persons.employees.SecurityWorker;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -86,30 +89,22 @@ public class MallRegion implements ICost {
         } else {throw new NullPointerException("Security worker cannot be null.");}
     }
 
-    public int getAllWorkersSalary(){
-
-        int result = 0;
-        for(Janitor janitor : janitors){
-            result+= janitor.getSalary();
-        }
-        return result;
-    }
     public int getAllWorkersSectionAvgSalary(){
-        int result = 0;
-        int counter = 0;
-        for(Janitor janitor : janitors){
-            result += janitor.getSalary();
-            counter++;
-        }
-        for(SecurityWorker securityWorker : securityWorkers){
-            result += securityWorker.getContractType().getHours();
-            counter++;
-        }
-        result+=manager.getSalary();
-        counter++;
-        return result/counter;
-    }
+        int result = getJanitors()
+                        .stream()
+                        .mapToInt(Janitor::getSalary)
+                        .sum();
 
+        result += getSecurityWorkers()
+                .stream()
+                .mapToInt(SecurityWorker::calculateSalary)
+                .sum();
+
+        result += getManager().calculateSalary();
+
+
+        return result/(janitors.size()+securityWorkers.size()+1);
+    }
     public Set<ShopOwner> getShopOwners() {
         return shopOwners;
     }
@@ -119,20 +114,8 @@ public class MallRegion implements ICost {
     }
 
 
-    public void printAllEmployees(){
-        Consumer<MallRegion> employees = region -> {
-
-            System.out.println("Manager: "+region.getManager().getName() +" "+region.getManager().getSurname());
-
-            region.getJanitors().forEach(janitor -> {
-                System.out.println("Janitor: " + janitor.getName() + " " + janitor.getSurname());
-            });
-            region.getSecurityWorkers().forEach(securityWorker -> {
-                System.out.println("SecurityWorker: " + securityWorker.getName() + " " + securityWorker.getSurname());
-            });
-        };
-
-        employees.accept(this);
+    public void printAllEmployees(Consumer<MallRegion> consumer){
+        consumer.accept(this);
     }
     @Override
     public String toString() {
@@ -159,14 +142,21 @@ public class MallRegion implements ICost {
 
     @Override
     public int calculateCost() {
-        int result = 0;
-        for(Janitor janitor : janitors){
-            result += janitor.getSalary();
-        }
-        for(SecurityWorker securityWorker : securityWorkers){
-            result += securityWorker.getContractType().getHours();
-        }
-        result+=manager.getSalary();
+        int result = getJanitors()
+                .stream()
+                .mapToInt(Janitor::getSalary)
+                .sum();
+
+        result += getSecurityWorkers()
+                .stream()
+                .mapToInt(SecurityWorker::calculateSalary)
+                .sum();
+
+        result += getManager().calculateSalary();
         return result;
+    }
+
+    public void raisedJanitorsSalary(IMyConsumer<Collection<Janitor>,Integer> raiseSalary, int bonus){
+        raiseSalary.accept(this.getJanitors(),bonus);
     }
 }

@@ -2,7 +2,6 @@ package com.solvd.laba.models.parkings;
 
 
 import com.solvd.laba.exception.NegativeValueException;
-import com.solvd.laba.exception.ValidationException;
 
 import com.solvd.laba.exception.WrongTimeException;
 import com.solvd.laba.interfaces.ISpaces;
@@ -10,6 +9,8 @@ import com.solvd.laba.interfaces.ISpaces;
 import java.time.LocalTime;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+
 
 public class Parking implements ISpaces {
 
@@ -95,31 +96,53 @@ public class Parking implements ISpaces {
                 '}';
     }
 
-    @Override
     public int calculateFreeSpaces() {
         if(parkingSpaces.isEmpty()){
             return 0;
         }
-        int counter = 0;
-        for(ParkingSpace parkingSpace : parkingSpaces.values()){
-            if(!parkingSpace.isOccupied()){
-                counter++;
-            }
-        }
-        return counter;
+        return (int) getParkingSpaces()
+                .values()
+                .stream()
+                .filter(parkingSpace -> !parkingSpace.isOccupied())
+                .count();
     }
 
-    @Override
+
     public int calculateOccupiedSpaces() {
         if(parkingSpaces.isEmpty()){
             return 0;
         }
-        int counter = 0;
-        for(ParkingSpace parkingSpace : parkingSpaces.values()){
-            if(parkingSpace.isOccupied()){
-                counter++;
-            }
+        return (int) getParkingSpaces()
+                .values()
+                .stream()
+                .filter(parkingSpace -> !parkingSpace.isOccupied())
+                .count();
+    }
+
+    public Optional<Integer> searchingSpace(){
+        return getParkingSpaces()
+                .values()
+                .stream()
+                .filter(ParkingSpace::isOccupied)
+                .map(ParkingSpace::getId)
+                .findFirst();
+
+    }
+
+    @Override
+    public void rentSpace(){
+        Optional<Integer> spaceId = searchingSpace();
+        if(spaceId.isPresent()){
+            getParkingSpaces()
+                    .values()
+                    .stream()
+                    .filter(parkingSpace -> parkingSpace.getId() == spaceId.get())
+                    .forEach(parkingSpace -> parkingSpace.setOccupied(true));
+
+            System.out.println("Your rented parking space number is: "+spaceId.get());
+        } else {
+            System.out.println("No space found");
         }
-        return counter;
     }
 }
+

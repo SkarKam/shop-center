@@ -4,11 +4,15 @@ import com.solvd.laba.enums.ParkingSpaceType;
 import com.solvd.laba.exception.NegativeValueException;
 import com.solvd.laba.interfaces.IRevenue;
 
-import java.awt.*;
+import java.util.List;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 public class ParkingSpace implements IRevenue, Serializable {
+
+    private static List<ParkingSpace> parkingSpaces = new ArrayList<>();
 
     private static int cost;
 
@@ -18,12 +22,14 @@ public class ParkingSpace implements IRevenue, Serializable {
     private boolean isPaid;
     private boolean isOccupied;
 
-    public ParkingSpace(int id, ParkingSpaceType type) {
-        this.id = id;
+
+    public ParkingSpace(Supplier<Integer> parkingSpaceID, ParkingSpaceType type) {
+        this.id = parkingSpaceID.get();
         this.type = type;
         this.isPaid = false;
         this.isOccupied = false;
         cost = 10;
+        parkingSpaces.add(this);
     }
 
     public int getId() {
@@ -71,6 +77,13 @@ public class ParkingSpace implements IRevenue, Serializable {
         }
     }
 
+    public static List<ParkingSpace> getParkingSpaces() {
+        return parkingSpaces;
+    }
+    public static void printParkingSpaces() {
+        getParkingSpaces()
+                .forEach(parkingSpace -> System.out.println(parkingSpace.getId() + " for: "+parkingSpace.getParkingSpaceType()));
+    }
 
     @Override
     public boolean equals(Object o) {

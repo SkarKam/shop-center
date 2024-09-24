@@ -8,6 +8,8 @@ import java.util.Objects;
 public class Janitor extends CenterEmployee {
 
     private int salary;
+    private int bonus;
+
 
     public Janitor(String name, String surname) {
         super(name, surname);

@@ -1,4 +1,4 @@
-package com.solvd.laba.interfaces;
+package com.solvd.laba.interfaces.lambdas;
 
 @FunctionalInterface
 public interface IMyPredict<T,R> {

@@ -3,7 +3,6 @@ package com.solvd.laba.models;
 import com.solvd.laba.exception.BlankValueException;
 
 import com.solvd.laba.interfaces.IShopCenter;
-import com.solvd.laba.interfaces.ISpaces;
 import com.solvd.laba.models.parkings.Parking;
 import com.solvd.laba.models.parkings.ParkingSpace;
 import com.solvd.laba.models.premises.Premise;
@@ -20,7 +19,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public class ShopCenter implements IShopCenter, ISpaces, Serializable {
+public class ShopCenter implements IShopCenter, Serializable {
 
     private static final Logger logger = LogManager.getLogger(ShopCenter.class);
 
@@ -84,6 +83,7 @@ public class ShopCenter implements IShopCenter, ISpaces, Serializable {
     public void setCenterWorkersSections(Set<MallRegion> mallRegions) {
         this.mallRegions = mallRegions;
     }
+
     public void addCenterWorkersSection(MallRegion mallRegion) {
         if(mallRegions != null) {
             this.mallRegions.add(mallRegion);
@@ -116,22 +116,24 @@ public class ShopCenter implements IShopCenter, ISpaces, Serializable {
         return Objects.hash(shopCenterName, premises, parking, address, mallRegions);
     }
 
+
     @Override
     public int calculateRevenue() {
-        Supplier<Integer> supplier = () -> {
-            int revenue = 0;
-            for (Premise premise : premises) {
-                revenue += premise.getRevenue();
-            }
-            for (ParkingSpace space : parking.getParkingSpaces().values()) {
-                revenue += space.getRevenue();
-            }
-            for (MallRegion mallRegion : mallRegions) {
-                revenue -= mallRegion.calculateCost();
-            }
+            int revenue = premises
+                    .stream()
+                    .mapToInt(Premise::getRevenue)
+                    .sum();
+            revenue += parking.getParkingSpaces()
+                    .values()
+                    .stream()
+                    .mapToInt(ParkingSpace::getRevenue)
+                    .sum();
+
+            revenue -= mallRegions
+                    .stream()
+                    .mapToInt(MallRegion::calculateCost)
+                    .sum();
             return revenue;
-        };
-        return supplier.get();
     }
 
     public void generateRevenueInfo(){
@@ -145,25 +147,25 @@ public class ShopCenter implements IShopCenter, ISpaces, Serializable {
             logger.error("Input File Error");
         }
     }
-    @Override
+
     public int calculateFreeSpaces() {
-        int result = 0;
-        for(Premise premise : premises){
-            if(premise.getShop()==null){
-                result++;
-            }
+        if(premises.isEmpty()){
+            return 0;
         }
-        return result;
+        return (int) getPremises()
+                .stream()
+                .filter(premise -> premise.getShop() == null)
+                .count();
     }
 
-    @Override
+
     public int calculateOccupiedSpaces() {
-        int result = 0;
-        for(Premise premise : premises){
-            if(premise.getShop()!=null){
-                result++;
-            }
+        if(premises.isEmpty()){
+            return 0;
         }
-        return result;
+        return (int) getPremises()
+                .stream()
+                .filter(premise -> premise.getShop() != null)
+                .count();
     }
 }

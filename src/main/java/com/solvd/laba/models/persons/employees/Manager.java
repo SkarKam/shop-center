@@ -3,20 +3,20 @@ package com.solvd.laba.models.persons.employees;
 import com.solvd.laba.enums.Rating;
 import com.solvd.laba.exception.NegativeValueException;
 import com.solvd.laba.exception.ValidationException;
-import com.solvd.laba.interfaces.IMyPredict;
+import com.solvd.laba.interfaces.IManger;
+import com.solvd.laba.models.MallRegion;
 
-import java.io.File;
 import java.util.function.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Manager extends CenterEmployee {
+public class Manager extends CenterEmployee implements IManger {
 
     private static int bonus = 1000;
 
     private int salary;
-    private List<Integer> ratings = new ArrayList<>();;
+    private List<Integer> ratings = new ArrayList<>();
     private boolean isObligationFulfilled;
 
     public Manager(String name, String surname) {
@@ -53,9 +53,8 @@ public class Manager extends CenterEmployee {
         return isObligationFulfilled;
     }
 
-    public void setObligationFulfilled() {
-        Predicate<Integer> isEnough = avgRating -> avgRating >= Rating.GOOD.getMinRate();
-        isObligationFulfilled = isEnough.test(getAverageRating());
+    public void setObligationFulfilled(Predicate<Rating> predicate) {
+        isObligationFulfilled = predicate.test(Rating.GOOD);
     }
 
     public List<Integer> getRating() {
@@ -75,14 +74,15 @@ public class Manager extends CenterEmployee {
     }
 
     public int getAverageRating() {
-        int result = 0;
-        int counter = 0;
-        for(Integer rating : ratings) {
-            result += rating;
-            counter++;
-        }
-        return result / counter;
+        int result = getRating()
+                .stream()
+                .mapToInt(rating -> rating)
+                .sum();
+
+        return result / getRating().size();
     }
+
+
     @Override
     public int calculateSalary() {
 
@@ -113,5 +113,54 @@ public class Manager extends CenterEmployee {
     @Override
     public int hashCode() {
         return Objects.hash(salary, isObligationFulfilled);
+    }
+
+    @Override
+    public void firedJanitor(Janitor janitor, MallRegion mallRegion) {
+        if(janitor==null){
+            throw new ValidationException("Janitor cannot be null");
+        }
+        if(mallRegion==null){
+            throw new ValidationException("MallRegion cannot be null");
+        }
+        if(!mallRegion.getManager().equals(this)){
+            throw new ValidationException("Manager cannot remove janitor from not his region");
+        }
+        mallRegion.getJanitors().remove(janitor);
+        System.out.println("Janitor get fired.");
+    }
+
+    @Override
+    public void replaceJanitorRegion(Janitor janitor, MallRegion currentRegion, MallRegion newRegion) {
+        if(janitor==null){
+            throw new ValidationException("Janitor cannot be null");
+        }
+        if(currentRegion==null || newRegion==null){
+            throw new ValidationException("MallRegion cannot be null");
+        }
+        if(!currentRegion.getManager().equals(this)){
+            throw new ValidationException("Manager cannot remove janitor from not his region");
+        }
+        if(!currentRegion.getJanitors().contains(janitor)){
+            throw new ValidationException("Janitor cannot remove janitor from not his region");
+        }
+        newRegion.getJanitors().add(janitor);
+        currentRegion.getJanitors().remove(janitor);
+        System.out.println("Successfully replaced janitor region");
+    }
+
+    @Override
+    public void hiredNewJanitor(Janitor janitor, MallRegion mallRegion) {
+        if(janitor==null){
+            throw new ValidationException("Janitor cannot be null");
+        }
+        if(mallRegion==null){
+            throw new ValidationException("MallRegion cannot be null");
+        }
+        if(!mallRegion.getManager().equals(this)){
+            throw new ValidationException("Manager cannot remove janitor from not his region");
+        }
+        mallRegion.getJanitors().add(janitor);
+        System.out.println("New employee"+janitor.getName() + " " + janitor.getSurname() +"was added.");
     }
 }
