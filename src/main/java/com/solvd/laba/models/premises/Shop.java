@@ -78,7 +78,7 @@ public class Shop implements Serializable {
     }
 
     public static void save(){
-        try(ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("./src/main/java/com/solvd/laba/files/revenue.txt"))){
+        try(ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("./src/main/java/com/solvd/laba/files/shops.txt"))){
             objectOutputStream.writeObject(shops);
         }
         catch (IOException e)
@@ -88,7 +88,7 @@ public class Shop implements Serializable {
         }
     }
     public static List<Shop> load(){
-        try(ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("./src/main/java/com/solvd/laba/files/revenue.txt"))) {
+        try(ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("./src/main/java/com/solvd/laba/files/shops.txt"))) {
             return (List<Shop>) objectInputStream.readObject();
         }
         catch (IOException e)

@@ -139,7 +139,7 @@ public class ShopCenter implements IShopCenter, Serializable {
 
     public void generateRevenueInfo(){
         logger.info("Creating Shop Center Revenue");
-        File file = new File("target/revenue.txt");
+        File file = new File("./src/main/java/com/solvd/laba/files/revenue.txt");
         try {
             FileUtils.writeStringToFile(file,String.valueOf(calculateRevenue()),"UTF-8");
             logger.info("Shop Center Revenue Info created");
