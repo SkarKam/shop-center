@@ -18,6 +18,10 @@ import com.solvd.laba.models.persons.employees.Manager;
 import com.solvd.laba.models.persons.employees.SecurityWorker;
 import com.solvd.laba.models.premises.Premise;
 import com.solvd.laba.models.premises.Shop;
+import com.solvd.laba.threads.ConnectionPool;
+import com.solvd.laba.threads.MockConnection;
+import com.solvd.laba.threads.MyRunnableThread;
+import com.solvd.laba.threads.MyThread;
 import com.solvd.laba.utils.CenterEmployeeUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -32,6 +36,7 @@ import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.*;
 import java.util.function.*;
 
 public class Main {
@@ -41,7 +46,8 @@ public class Main {
     static File file = new File("target/revenue.txt");
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
+
 
         Function<Integer, Integer> getCost = size -> {
             return size * Premise.getMonthlyCost();
@@ -123,18 +129,18 @@ public class Main {
 
         parking = new Parking(4);
 
-        securityWorker1 = new SecurityWorker("John","Doe");
-        securityWorker2 = new SecurityWorker("Oliver","Los");
-        securityWorker3 = new SecurityWorker("George","Kos");
-        securityWorker4 = new SecurityWorker("Noah","Tos");
+        securityWorker1 = new SecurityWorker("John","Doe",nameRefactor);
+        securityWorker2 = new SecurityWorker("Oliver","Los",nameRefactor);
+        securityWorker3 = new SecurityWorker("George","Kos",nameRefactor);
+        securityWorker4 = new SecurityWorker("Noah","Tos",nameRefactor);
 
-        janitor1 = new Janitor("Arthur","Eos");
-        janitor2 = new Janitor("Leo","Ross");
-        janitor3 = new Janitor("Jack","Sos");
-        janitor4 = new Janitor("Harry","Pot");
+        janitor1 = new Janitor("Arthur","Eos",nameRefactor);
+        janitor2 = new Janitor("Leo","Ross",nameRefactor);
+        janitor3 = new Janitor("Jack","Sos",nameRefactor);
+        janitor4 = new Janitor("Harry","Pot",nameRefactor);
 
-        manager1 = new Manager("Olivia","Doe");
-        manager2 = new Manager("Markus","Wulfhart");
+        manager1 = new Manager("Olivia","Doe",nameRefactor);
+        manager2 = new Manager("Markus","Wulfhart",nameRefactor);
 
         Set<Janitor> temp = new HashSet();
         temp.add(janitor1);
@@ -223,6 +229,9 @@ public class Main {
 
         System.out.println(getCost.apply(20));
 
+
+
+
         System.out.println("Welcome to shop center system.");
 
 
@@ -235,7 +244,7 @@ public class Main {
         shopCenter.generateRevenueInfo();
         while(true){
             Scanner scanner = new Scanner(System.in);
-            System.out.println("Choose action: \n1) Display all employees\n2) Add new employee\n3) Read Shop Center revenue\n4) Display shops\n5) Exit program and activate relfection method");
+            System.out.println("Choose action: \n1) Display all employees\n2) Add new employee\n3) Read Shop Center revenue\n4) Display shops\n 5) Thread test\n6) Lambda test \n7) Exit program and activate relfection method");
             switch(scanner.next()){
                 case "1":
                         mallRegion1.printAllEmployees(employees);
@@ -262,7 +271,7 @@ public class Main {
                     switch(scanner.next()){
                         case "1":
                             try{
-                                CenterEmployee centerEmployee1 = new Manager(name ,surname);
+                                CenterEmployee centerEmployee1 = new Manager(name ,surname,nameRefactor);
                                 System.out.println("Successfully added new manger named: "+centerEmployee1.getName() +" "+centerEmployee1.getSurname());
 
                             }catch (Exception e){
@@ -272,7 +281,7 @@ public class Main {
                             break;
                         case "2":
                             try{
-                                CenterEmployee centerEmployee1 = new Janitor(name,surname);
+                                CenterEmployee centerEmployee1 = new Janitor(name,surname,nameRefactor);
                                 System.out.println("Successfully added new manger named: "+centerEmployee1.getName() +" "+centerEmployee1.getSurname());
                                 mallRegion1.addJanitor((Janitor) centerEmployee1);
                             }catch (Exception e){
@@ -282,7 +291,7 @@ public class Main {
                             break;
                         case "3":
                             try{
-                                CenterEmployee centerEmployee1 = new SecurityWorker(name,surname);
+                                CenterEmployee centerEmployee1 = new SecurityWorker(name,surname,nameRefactor);
                                 System.out.println("Successfully added new manger named: "+centerEmployee1.getName() +" "+centerEmployee1.getSurname());
                                 mallRegion1.addSecurityWorker((SecurityWorker) centerEmployee1);
                             }catch (Exception e){
@@ -315,6 +324,45 @@ public class Main {
                     System.out.println(Shop.load());
                     break;
                 case "5":
+                    threadsTest();
+                    break;
+                case "6":
+                    System.out.println("Choose lambda:\n1)Print all employees(Consumer)\n2)Raise security workers rate(BiFunction)\n" +
+                            "3)Obligation achieved(Prediction)\n4)Setting shop predition(Custom Prediction)\n5)Function" +
+                            "\n6)Raise janitors salary(Custom Consumer)" +
+                            "\n7)Exit");
+                    switch(scanner.next()){
+                        case "1":
+                            mallRegion1.printAllEmployees(employees);
+                            break;
+                        case "2":
+                            System.out.println("Rate before change: "+securityWorker1.getRate());
+                            securityWorker1.raiseRate(raise,30);
+                            System.out.println("Rate after change: "+securityWorker1.getRate());
+                            break;
+                        case "3":
+                            System.out.println("Manager obligation: "+manager2.isObligationFulfilled());
+                            manager2.setObligationFulfilled(isEnough);
+                            System.out.println("Manager obligation: "+manager2.isObligationFulfilled());
+                            break;
+                        case "4":
+                            premise2.setShop(shop2,premisePrediction);
+                            break;
+                        case "5":
+
+                            break;
+                        case "6":
+                            System.out.println("Janitor normal salary: "+janitor1.getSalary());
+                            mallRegion1.raisedJanitorsSalary(raiseSalary,400);
+                            System.out.println("Janitor raised salary: "+janitor1.getSalary());
+                            break;
+                        case "7":
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case "7":
                     reflectionMethod();
                     logger.info("Exiting program");
                     System.out.println("Exiting program");
@@ -372,4 +420,59 @@ public class Main {
         }
     }
 
+
+    public static void threadsTest() throws InterruptedException {
+        System.out.println("Threads test:");
+
+        System.out.println("\nCustom threads test.");
+        Thread thread1 = new MyThread();
+        Thread thread2 = new Thread(new MyRunnableThread());
+
+        thread1.start();
+        thread2.start();
+
+
+        while(thread1.isAlive() || thread2.isAlive()){
+        }
+        System.out.println("\nConnection pool test:\n");
+
+        ConnectionPool connectionPool = new ConnectionPool(5);
+
+        ExecutorService executorService = Executors.newFixedThreadPool(7);
+
+        for(int i = 0; i<7; i++){
+            executorService.execute(() -> {
+                try{
+                    MockConnection connection = connectionPool.getConnection();
+                    connection.testMethod();
+                    connectionPool.releaseConnection(connection);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            });
+        }
+
+        executorService.shutdown();
+        executorService.awaitTermination(1, TimeUnit.MINUTES);
+
+        while(!executorService.isTerminated()){}
+        System.out.println("\nFuture test test:\n");
+        CompletableFuture<Void>  completableFuture = CompletableFuture.runAsync(() -> {
+            try {
+                MockConnection connection = connectionPool.getConnection();
+                connection.testMethod();
+                connectionPool.releaseConnection(connection);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }).exceptionally(e -> {
+            System.err.println(e.getMessage());
+            return null;
+        });
+
+
+        while(!completableFuture.isDone()){}
+        System.out.println();
+        System.out.println("Threads test ended.");
+    }
 }

@@ -3,6 +3,7 @@ package com.solvd.laba.models.persons.clients;
 import com.solvd.laba.collections.CustomLinkedList;
 import com.solvd.laba.interfaces.IShopOwner;
 import com.solvd.laba.interfaces.lambdas.IMyPredict;
+import com.solvd.laba.interfaces.lambdas.IStringRefactor;
 import com.solvd.laba.models.persons.Person;
 import com.solvd.laba.models.premises.Premise;
 import com.solvd.laba.models.premises.Shop;
@@ -18,8 +19,8 @@ public final class ShopOwner extends Person implements IShopOwner {
     private CustomLinkedList<Shop> shops;
 
 
-    public ShopOwner(String name, String surname, int ratings) {
-        super(name, surname);
+    public ShopOwner(String name, String surname, int ratings, IStringRefactor<String> iStringRefactor) {
+        super(name, surname, iStringRefactor);
         this.ratings.add(7);
     }
 

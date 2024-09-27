@@ -3,15 +3,16 @@ package com.solvd.laba.models.persons;
 import com.solvd.laba.interfaces.lambdas.IStringRefactor;
 
 import java.util.Objects;
+import java.util.function.Supplier;
 
 public abstract class Person {
 
     protected String name;
     protected String surname;
 
-    public Person(String name, String surname) {
-        this.name = name;
-        this.surname = surname;
+    public Person(String name, String surname, IStringRefactor<String> iStringRefactor) {
+        this.name = iStringRefactor.refactor(name);
+        this.surname = iStringRefactor.refactor(surname);
     }
 
 

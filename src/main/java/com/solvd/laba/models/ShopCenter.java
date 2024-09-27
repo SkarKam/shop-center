@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.nio.file.NoSuchFileException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -48,16 +49,16 @@ public class ShopCenter implements IShopCenter, Serializable {
         }
     }
 
-    public List<Premise> getPremises() {
-        return premises;
+    public Optional<List<Premise>> getPremises() {
+        return Optional.ofNullable(premises);
     }
 
     public void setPremises(List<Premise> premises) {
         this.premises = premises;
     }
 
-    public Parking getParking() {
-        return parking;
+    public Optional<Parking> getParking() {
+        return Optional.ofNullable(parking);
     }
 
     public void setParking(Parking parking) {
@@ -148,13 +149,13 @@ public class ShopCenter implements IShopCenter, Serializable {
         }
     }
 
-    public int calculateFreeSpaces() {
+/*    public int calculateFreeSpaces() {
         if(premises.isEmpty()){
             return 0;
         }
         return (int) getPremises()
                 .stream()
-                .filter(premise -> premise.getShop() == null)
+                .filter(premise -> premise.get() == null)
                 .count();
     }
 
@@ -167,5 +168,5 @@ public class ShopCenter implements IShopCenter, Serializable {
                 .stream()
                 .filter(premise -> premise.getShop() != null)
                 .count();
-    }
+    }*/
 }

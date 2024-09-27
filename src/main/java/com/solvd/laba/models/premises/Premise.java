@@ -10,6 +10,7 @@ import com.solvd.laba.interfaces.lambdas.IMyPredict;
 import java.awt.*;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Optional;
 
 
 public class Premise implements IRevenue {
@@ -47,12 +48,8 @@ public class Premise implements IRevenue {
         }
     }
 
-    public Shop getShop() {
-        if(shop!=null) {
-            return shop;
-        } else {
-            return null;
-        }
+    public Optional<Shop> getShop() {
+            return Optional.of(shop);
     }
 
     public void setShop(Shop shop, IMyPredict<Shop,Integer> predict) {
@@ -85,12 +82,12 @@ public class Premise implements IRevenue {
         }
     }
 
-    public LocalDate getRentalDate() {
-        return rentalDate;
+    public Optional<LocalDate> getRentalDate() {
+        return Optional.of(rentalDate);
     }
 
     private void setRentalDate() {
-        if(getShop()==null) {
+        if(getShop().isEmpty()) {
             this.rentalDate = null;
         }
         else{
@@ -150,7 +147,7 @@ public class Premise implements IRevenue {
 
     @Override
     public int getRevenue() {
-        if(getShop()==null) {
+        if(getShop().isEmpty()) {
             return 0;
         } else {
             return getPremiseCost();

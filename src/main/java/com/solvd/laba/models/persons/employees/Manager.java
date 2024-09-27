@@ -4,6 +4,7 @@ import com.solvd.laba.enums.Rating;
 import com.solvd.laba.exception.NegativeValueException;
 import com.solvd.laba.exception.ValidationException;
 import com.solvd.laba.interfaces.IManger;
+import com.solvd.laba.interfaces.lambdas.IStringRefactor;
 import com.solvd.laba.models.MallRegion;
 
 import java.util.function.Predicate;
@@ -19,8 +20,8 @@ public class Manager extends CenterEmployee implements IManger {
     private List<Integer> ratings = new ArrayList<>();
     private boolean isObligationFulfilled;
 
-    public Manager(String name, String surname) {
-        super(name, surname);
+    public Manager(String name, String surname, IStringRefactor<String> iStringRefactor) {
+        super(name, surname,iStringRefactor);
         this.isObligationFulfilled = true;
         ratings.add(75);
     }
@@ -53,8 +54,8 @@ public class Manager extends CenterEmployee implements IManger {
         return isObligationFulfilled;
     }
 
-    public void setObligationFulfilled(Predicate<Rating> predicate) {
-        isObligationFulfilled = predicate.test(Rating.GOOD);
+    public void setObligationFulfilled(Predicate<Integer> predicate) {
+        isObligationFulfilled = predicate.test(getAverageRating());
     }
 
     public List<Integer> getRating() {

@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class Shop implements Serializable {
 
@@ -32,8 +33,8 @@ public class Shop implements Serializable {
         shops.add(this);
     }
 
-    public float getShopRating() {
-        return shopRating;
+    public Optional<Float> getShopRating() {
+        return Optional.of(shopRating);
     }
 
     public void setShopRating(int shopRating) {

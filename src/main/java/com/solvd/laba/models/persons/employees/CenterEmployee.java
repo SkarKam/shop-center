@@ -2,6 +2,7 @@ package com.solvd.laba.models.persons.employees;
 
 import com.solvd.laba.enums.ContractType;
 import com.solvd.laba.interfaces.ICenterEmployee;
+import com.solvd.laba.interfaces.lambdas.IStringRefactor;
 import com.solvd.laba.models.persons.Person;
 
 import java.time.LocalDate;
@@ -13,8 +14,8 @@ public abstract class CenterEmployee extends Person implements ICenterEmployee {
 
     protected LocalDate dateOfEmployment;
 
-    public CenterEmployee(String name, String surname) {
-        super(name,surname);
+    public CenterEmployee(String name, String surname, IStringRefactor<String> iStringRefactor) {
+        super(name,surname, iStringRefactor);
         dateOfEmployment = LocalDate.now();
         centerName = "SunnyCenter";
     }

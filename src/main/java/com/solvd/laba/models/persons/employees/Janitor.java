@@ -2,6 +2,7 @@ package com.solvd.laba.models.persons.employees;
 
 import com.solvd.laba.enums.ContractType;
 import com.solvd.laba.exception.ValidationException;
+import com.solvd.laba.interfaces.lambdas.IStringRefactor;
 
 import java.util.Objects;
 
@@ -11,8 +12,8 @@ public class Janitor extends CenterEmployee {
     private int bonus;
 
 
-    public Janitor(String name, String surname) {
-        super(name, surname);
+    public Janitor(String name, String surname, IStringRefactor<String> iStringRefactor) {
+        super(name, surname, iStringRefactor);
     }
 
     public int getSalary() {
@@ -26,6 +27,7 @@ public class Janitor extends CenterEmployee {
             throw new ValidationException("Salary should be larger than actually salary");
         }
     }
+
 
     @Override
     public int calculateSalary() {

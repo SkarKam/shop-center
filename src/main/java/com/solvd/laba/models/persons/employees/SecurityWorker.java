@@ -4,6 +4,7 @@ import com.solvd.laba.enums.ContractType;
 import com.solvd.laba.exception.NegativeValueException;
 import com.solvd.laba.exception.BlankValueException;
 import com.solvd.laba.exception.ValidationException;
+import com.solvd.laba.interfaces.lambdas.IStringRefactor;
 
 import java.util.Objects;
 import java.util.function.BiFunction;
@@ -21,8 +22,8 @@ public class SecurityWorker extends CenterEmployee {
         securityCompany = "SecCom";
     }
 
-    public SecurityWorker(String name, String surname) {
-        super(name, surname);
+    public SecurityWorker(String name, String surname, IStringRefactor<String> iStringRefactor) {
+        super(name, surname, iStringRefactor);
         this.rate = 25;
     }
 
