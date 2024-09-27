@@ -460,22 +460,22 @@ public class Main {
 
         while(!executorService.isTerminated()){}
         System.out.println("\nFuture test test:\n");
-        CompletableFuture<Void>  completableFuture = CompletableFuture.runAsync(() -> {
-            try {
-                MockConnection connection = connectionPool.getConnection();
-                connection.testMethod();
-                connectionPool.releaseConnection(connection);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }).exceptionally(e -> {
-            System.err.println(e.getMessage());
-            return null;
-        });
+            CompletableFuture<Void>  completableFuture = CompletableFuture.runAsync(() -> {
+                for(int i = 0; i < 7; i++) {
+                    try {
+                        MockConnection connection = connectionPool.getConnection();
+                        connection.testMethod();
+                        connectionPool.releaseConnection(connection);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }}).thenAccept(System.out::println);
 
 
         while(!completableFuture.isDone()){}
+
         System.out.println();
         System.out.println("Threads test ended.");
+
     }
 }
