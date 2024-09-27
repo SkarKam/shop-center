@@ -43,15 +43,12 @@ public class Main {
 
     private static final Logger logger = LogManager.getLogger(Main.class);
 
-    static File file = new File("target/revenue.txt");
+//    static File file = new File("target/revenue.txt");
 
+    static File file = new File("./src/main/java/com/solvd/laba/files/revenue.txt");
 
     public static void main(String[] args) throws InterruptedException {
 
-
-        Function<Integer, Integer> getCost = size -> {
-            return size * Premise.getMonthlyCost();
-        };
 
         BiFunction<SecurityWorker, Integer, Boolean> raise = (securityWorker, rate) -> {
             if(securityWorker.getContractType().getHours()>168){
@@ -90,6 +87,12 @@ public class Main {
         IMyConsumer<Collection<Janitor>,Integer> raiseSalary = (janitors, extra) -> {
           janitors.forEach(janitor -> janitor.setSalary(janitor.getSalary() + extra));
         };
+
+
+        Function<Integer,String> getCostWithCurrency = (size) -> {
+            return size.toString()+" EUR";
+        };
+
 
         Shop shop1, shop2;
         Premise premise1, premise2;
@@ -227,7 +230,7 @@ public class Main {
         System.out.println(CenterEmployeeUtil.getSalaries(manager1));
         System.out.println(CenterEmployeeUtil.getSalaries(securityWorker1));
 
-        System.out.println(getCost.apply(20));
+        System.out.println(getCostWithCurrency.apply(20));
 
 
 
@@ -349,7 +352,7 @@ public class Main {
                             premise2.setShop(shop2,premisePrediction);
                             break;
                         case "5":
-
+                            premise1.printPremiseCost(getCostWithCurrency);
                             break;
                         case "6":
                             System.out.println("Janitor normal salary: "+janitor1.getSalary());

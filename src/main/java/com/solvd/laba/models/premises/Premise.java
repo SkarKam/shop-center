@@ -11,6 +11,7 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
 
 public class Premise implements IRevenue {
@@ -122,6 +123,9 @@ public class Premise implements IRevenue {
         }
     }
 
+    public void printPremiseCost(Function<Integer,String> function){
+        System.out.println(function.apply(getPremiseCost()));
+    }
     @Override
     public String toString() {
         return "\nPremise{" +

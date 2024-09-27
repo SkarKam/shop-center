@@ -16,4 +16,5 @@ public enum  ShopType {
     public int getEstimitedIncome() {
         return estimitedIncome;
     }
+
 }
