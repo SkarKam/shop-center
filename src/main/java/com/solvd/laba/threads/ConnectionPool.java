@@ -10,7 +10,7 @@ public class ConnectionPool {
     private BlockingDeque<MockConnection> usedConnections;
 
 
-    public ConnectionPool(int poolSize) {
+    private ConnectionPool(int poolSize) {
         this.poolSize = poolSize;
         usedConnections = new LinkedBlockingDeque<MockConnection>(poolSize);
         for (int i = 0; i < poolSize; i++) {
@@ -18,7 +18,7 @@ public class ConnectionPool {
         }
     }
 
-    public synchronized ConnectionPool getInstance(int poolSize) {
+    public static synchronized ConnectionPool getInstance(int poolSize) {
         if(instance == null){
             instance = new ConnectionPool(poolSize);
         }

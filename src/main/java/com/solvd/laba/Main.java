@@ -439,8 +439,7 @@ public class Main {
         }
         System.out.println("\nConnection pool test:\n");
 
-        ConnectionPool connectionPool = new ConnectionPool(5);
-
+        ConnectionPool connectionPool = ConnectionPool.getInstance(5);
         ExecutorService executorService = Executors.newFixedThreadPool(7);
 
         for(int i = 0; i<7; i++){
